@@ -1,8 +1,6 @@
 # Temporary files
 *.tmp
 *.temp
-.DS_Store
-Thumbs.db
 
 # Editor files
 .vscode/

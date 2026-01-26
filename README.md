@@ -175,10 +175,10 @@ Choose one of the following methods:
 3. Add the following CORS policy inside the `<inbound>` section:
 
 ```xml
-<cors allow-credentials="true">
+<cors allow-credentials="false">
     <allowed-origins>
         <origin>https://copilotstudio.microsoft.com</origin>
-        <origin>https://*.powerplatform.com</origin>
+        <origin>https://web.powerva.microsoft.com</origin>
     </allowed-origins>
     <allowed-methods>
         <method>GET</method>
@@ -356,7 +356,16 @@ MCP enables:
   You are a helpful AI assistant that helps users access SAP business data.
   You can retrieve business partner information, sales orders, and product details.
   Always provide accurate data from SAP and format responses in a clear, user-friendly way.
-  If you're unsure about any data, ask clarifying questions.
+  
+  Error Handling:
+  - If the SAP system is unavailable, inform users that you're experiencing technical difficulties and ask them to try again later.
+  - If a user requests data they don't have access to, politely explain that they don't have the necessary permissions and suggest contacting their system administrator.
+  - If you encounter an error retrieving data, apologize and ask the user to rephrase their request or provide more specific criteria.
+  
+  Data Access:
+  - Only retrieve data that users are authorized to access based on their SAP permissions.
+  - Never make assumptions about data - if you're unsure, ask clarifying questions.
+  - If a query returns no results, acknowledge this and suggest alternative search criteria.
   ```
 
 4. Click **"Create"**
