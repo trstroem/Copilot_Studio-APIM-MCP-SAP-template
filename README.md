@@ -17,5 +17,5 @@ Roughly 30 minutes
 
 Proceed to Step 1 to continue:
 
-[Step 1 - prepare the OData service](./Step%201%20-%20prepare%20the%20OData%20service)
+[Step 1 - prepare the OData service](./Step%201%20-%20prepare%20the%20OData%20service.md)
 
