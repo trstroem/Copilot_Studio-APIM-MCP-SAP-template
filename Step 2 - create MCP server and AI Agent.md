@@ -62,7 +62,7 @@ This, really, is the end of the road. Now, after saving, you should be able to h
 
 Follow up with more questions - try exploring the capabilities of your agent. On the left hand of the screen, you should be able to see the technical "path" taken by the agent when it tries to retrieve information. You can also ask the agent which steps it did to retrieve the answer:
 
-![Copilot Studio - create agent](/media/techdata.png)
+![Copilot Studio - create agent](/media/techdetails.png)
 
 # Final comments and observations
 
