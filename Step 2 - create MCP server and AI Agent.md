@@ -1,15 +1,15 @@
 # Create an MCP server and AI Agent
 
-We have created & tested our OData service as an API. In order to consume it in the AI Agent we are to set up, we fist need to expose it as an MCP server. This allows the agent to select between different operations based on the user input. For example, a query such as "show me the 5 most valuable orders by gross amount" should point the agent towards the "Get entities from SalesOrderLineItemSet". The advantage of using an MCP server is that this allows the agent's LLM (model) to deduce which operation to execute, instead of us pointing explicitly towards it. MCP provides the tools for us.
+By now, we have created & tested our OData service as an API. In order to consume it in the AI Agent we are to set up, we first need to expose it as an MCP server. This allows the agent to select between the different OData operations based on the user input. For example, a query such as "show me the 5 most valuable orders by gross amount" should point the agent towards the "Get entities from SalesOrderLineItemSet" operation. The advantage of using an MCP server is that this allows the agent's LLM (model) to deduce which operation to execute, instead of us pointing explicitly towards it. MCP provides the tools for us.
 
-In APIM, we can set this up very easily. On the left menu, simply select "MCP servers" and then, in the "Create MCP server" dropdown, select "Expose an API as an MCP server".
+In Azure APIM, we can set this up very easily. On the left menu, simply select "MCP servers" and then, in the "Create MCP server" dropdown, select "Expose an API as an MCP server".
 
 This will open the below screen:
 
 ![New MCP server](/media/mcp1.png)
 
 
-Here, we need to select our existing API, followed by the API operations. This is the interesting part; it consists of deciding what we want our MCP server to be capable of doing - think of it as designing your own personal Swiss army knife. For an initial test scenario, you could select the following operations:
+Here, we need to select our existing API, followed by the API operations we want to include. This is the interesting part; it consists of deciding what skills we want our MCP server to be capable of doing - think of it as designing your own personal Swiss army knife. For an initial test scenario, you could select the following operations:
 
 - Get entities from BusinessPartnerSet
 - Get entities from ProductSet
@@ -20,6 +20,8 @@ Here, we need to select our existing API, followed by the API operations. This i
 - Get entities from SalesOrderSet by key
 
 All of these operations are read-only; you could also experiment with adding or deleting entities.
+
+Tip: don't select too many operations for this first MCP server; we don't want to overload our LLM when running the agent. Remember that agents should be designed to perform a specific task (or set of tasks related to a specific topic - not everything).
 
 ![Adding operations to MCP server](/media/mcp2.png)
 
@@ -80,4 +82,5 @@ We have created an agent with Copilot Studio allowing us to interact with SAP da
 
 Publishing the agent can be done using Copilot Studio's built-in Publish functionality. In principle, agents can be published to an internal Copilot tenant or Teams - allowing users across your organization to add the agent to their personal toolset.
 
-MCP servers exposing SAP OData services should be limited to specific scenarios. Adding more operations than needed could possibly bog down the agent - just as Swiss army knives with too many tools can be complicated to use... but feel free to experiment!
+As mentioned, MCP servers exposing SAP OData services should be limited to specific scenarios. Adding more operations than needed could possibly bog down the agent - just as Swiss army knives with too many tools can be complicated to use... but feel free to experiment!
+

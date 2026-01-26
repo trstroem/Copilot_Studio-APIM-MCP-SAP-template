@@ -20,16 +20,21 @@ https://[your SAP DNS address or IP]/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/$metadat
 
 You will have to authenticate with your SAP user.
 
-The metadata looks something like this:
+Note: if you are using a different OData service, the process will be identical to the one described here - apart from the operations available in your specific service being different. This should not matter.
+
+Another note: if you are running your own private SAP system (from CAL, for example), you may have to use the external IP address or create your own DNS resolution. There is more info related to this scenario in Step 2 of this repository.
+
+
+The metadata of the GWSAMPLE_BASIC service looks something like this:
 
 ![metadata](/media/metadata.png)
 
 
-Our first step towards Agentic AI world domination involves exposing this OData service in Azure API Management (APIM). The reasons for using APIM are twofold: firstly, it keeps all of our services (perhaps with the exception of SAP itself) on Azure; secondly, APIM has a built-in MCP wizard.
+Our first step towards Agentic AI world domination involves exposing this OData service in Azure API Management (APIM). The reasons for using Azure APIM are twofold: firstly, it keeps all of our services (perhaps with the exception of SAP itself) on Azure; secondly (and more important!!), Azure APIM has a built-in MCP wizard.
 
 MCP is like giving your AI a Swiss Army knife and a map — suddenly it not only knows where to go, it can also open every door along the way.
 
-(Disclaimer: I used Copilot for that)...
+(Disclaimer: I asked Copilot to generate that phrase)...
 
 Create an Azure API Management service (or use an existing one). This is done in the Azure portal by searching for "Azure API Management":
 
@@ -43,23 +48,23 @@ The APIM service has different pricing tiers. Some of these may not work with th
 
 For the remaining options, anything should be fine. You may want to set up the APIM service in the same region as your SAP workloads for latency and data transfer cost reasons.
 
-Once the APIM service is available, we need to create the API endpoint for our GWSAMPLE_BASIC service. The easiest way to do this is by converting the metadata into an "OpenAPI" format, then upload this into APIM. Here is how:
+Once the APIM service is up and running, we need to define the API endpoint for our GWSAMPLE_BASIC service. The easiest way to do this is by converting the metadata from the service we're using into an "OpenAPI" format, then upload this into APIM. Here is how:
 
-Enter the address for the GWSAMPLE_BASIC service in a browser window, as described above. This will result in the metadata for your service to be displayed. Now, copy everything in the browser window (starting with the "<edmx:Edmx...> tag) to your clipboard (ctrlC). Then, open a new browser tab and point it to https://convert.odata-openapi.net/ - and paste the XML content you just copied into the "Manual Input..." field:
+Enter the address for the GWSAMPLE_BASIC service in a browser window, as described above. This will result in the metadata for your service to be displayed. Now, copy everything in the browser window (starting with the "<edmx:Edmx...> tag) to your clipboard (Ctrl+C). Then, open a new browser tab and point it to https://convert.odata-openapi.net/ - and paste the complete XML content you just copied into the "Manual Input..." field:
 
 ![Converting OData metadata](/media/convertodata.png)
 
 
-Click the Convert to OpenAPI3 button. You should now have a "Converted Result" further down the page. Click the Download button to save it locally as a file.
+Make sure the first line is the one starting with the edmx tag - otherwise you will get an error message. Now, click the Convert to OpenAPI3 button. You should now have a "Converted Result" further down in the browser page. Click the Download button to save it locally as a file.
 
 Back in your APIM service, you can now create an API by clicking the API menu on the left of the page, then select the OpenAPI option:
 
 ![Creating an OpenAPI-based API](/media/createOpenAPI.png)
 
 
-On the pop-up screen that follows, simply select the file with your OpenAPI definition, and select a suitable name for your new API.
+On the pop-up screen that follows, simply select the file with your OpenAPI definition, and decide on a suitable name for your new API.
 
-We now have an API - where we can see the OData operations available as per the metadata definition of the OData service:
+We now have an API - where we can see all the OData operations available as per the metadata definition of the OData service:
 
 ![Operations](/media/operations.png)
 
@@ -68,21 +73,21 @@ The next step is to add our authentication method for the API.
 
 In this simplified template, we will opt for the basic authentication - user and password. In a production scenario, you would want to implement principal propagation - a future iteration of this repository will hopefully show how to do this. For now, the following steps are required:
 
-In APIM, create two Named Values to hold the user and password for the SAP system: click "Named values" in the APIM menu on the left, then the "+ Add" button at the top of the screen:
+In Azure APIM, create two Named Values to hold the user and password for the SAP system: click "Named values" in the APIM menu on the left, then the "+ Add" button at the top of the screen:
 
 ![Named values](/media/namedvalues.png)
 
 
 (As you can see, I've created two values - one for the standard user BPINST of my test system, and another for the password).
 
-The first named value will be the user - it will be of type "Plain". The second will be the password, with type Secret.
+The first named value will be the user - it will be of type "Plain". The second will be the password, with type "Secret".
 
 These two values will now have to be added to our authentication method in the API. Go back to the API we just created, select the "Design" tab on the main API screen, and click the "base" button in the Inbound processing section:
 
 ![authentication](/media/base.png)
 
 
-In the html code that opens, add the following line where shown:
+This will open a window with html code. Add the following line where it's shown in the image:
 
 <authentication-basic username="{{username}}" password="{{password}}" />
 
@@ -90,12 +95,12 @@ In the html code that opens, add the following line where shown:
 ![adding authentication](/media/authentication.png)
 
 
-Save this and move to the "Settings" tab of the API service. Here, we need to enter the Web service URL of our OData service. If we are using a "proper" SAP system with DNS resolution, enter this in the URL window. If using a temporary system provided with CAL, you will probably need to enter the external IP of that system, as shown here:
+Save this and move to the "Settings" tab of the API service. Here, we need to enter the Web service URL of our OData service. This will be the same URL we tested in our browser to examine the metadata - minus the "$metadata" at the end. If we are using a "proper" SAP system with DNS resolution, enter this in the URL window. If using a temporary system provided with CAL, you will probably need to enter the external IP of that system, as shown here:
 
 ![External IP](/media/apidetails1.png)
 
 
-There is an option to create a "subscription" in APIM - for now, we will not use this (it can be added later). By scrolling down the Settings page, ensure the options are as follows:
+There is an option to create a "subscription" in APIM - for now, we will not use this (it can be added later. Subscriptions allows you to further secure the API by providing an API key). By scrolling down the Settings page, ensure the remaining options are set as follows:
 
 ![More settings](/media/apidetails2.png)
 
@@ -105,11 +110,11 @@ The last step before testing our API is related to our simplistic implementation
 ![Creating a backend](/media/apidetails2.png)
 
 
-In the Runtime URL field, enter the external IP of your SAP system, followed by "/sap", like this:
+In the Runtime URL field, enter the external IP (or domain name) of your SAP system, followed by "/sap", like this:
 
-https://xxx.xxx.xxx.xxx/sap
+https://xxx.xxx.xxx.xxx/sap - or https://mydomain.com/sap
 
-Further down, open the "Advanced" section and de-select the Validate certificate boxes:
+Further down, on the same screen, open the "Advanced" section and de-select the Validate certificate boxes:
 
 ![Certificates](/media/backend1.png)
 
@@ -124,7 +129,7 @@ The result should be like this:
 ![Result](/media/test2.png)
 
 
-Important note for CAL-provided SAP systems: if you are using your own CAL-provided SAP instance, you probably have to explicitly allow inbound TCP requests to your external SAP IP - by adding an onbound rule in the NSG (Network Security Group) allocated to the SAP HANA DB server. This inbound rule must allow TCP access from your originating IP (where you make the calls from, e.g. your laptop), to port 44300 of the SAP HANA DB server. Another option is to allow VNet injection when setting up your APIM service; please see Azure documentation for instructions. 
+Important note for CAL-provided SAP systems: if you are using your own CAL-provided SAP instance, you probably have to explicitly allow inbound TCP requests to your external SAP IP - by adding an inbound rule in the NSG (Network Security Group) allocated to the SAP HANA DB server - or the subnet. This inbound rule must allow TCP access from your originating IP (where you make the calls from, e.g. your laptop), to port 44300 of the SAP HANA DB server. Another option is to allow VNet injection when setting up your APIM service; please see Azure documentation for instructions. 
 
 We have now created & tested our OData service as an API - the next section will show how to expose it as an MCP server and invoke it in a Copilot Studio Agent.
 
