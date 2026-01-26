@@ -112,5 +112,5 @@ Important note for CAL-provided SAP systems: if you are using your own CAL-provi
 
 We have now created & tested our OData service as an API - the next section will show how to expose it as an MCP server and invoke it in a Copilot Studio Agent.
 
-Proceed to [Step 2 - create MCP server and AI Agent](./Step%202%20-%20create%20MCP%20server%20and%20AI%20Agent) to continue.
+Proceed to [Step 2 - create MCP server and AI Agent](./Step%202%20-%20create%20MCP%20server%20and%20AI%20Agent.md) to continue.
 
